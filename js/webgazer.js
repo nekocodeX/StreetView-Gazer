@@ -88232,6 +88232,9 @@ async function init(stream) {
   videoElement.autoplay = true;
   videoElement.style.display = src_webgazer.params.showVideo ? 'block' : 'none';
   videoElement.style.position = 'fixed';
+  /*** Added style by nekocodeX on Sep 27, 2020 ***/
+  videoElement.style.zIndex = 1000;
+
   videoElement.style.top = topDist;
   videoElement.style.left = leftDist;
   // We set these to stop the video appearing too large when it is added for the very first time
@@ -88250,6 +88253,9 @@ async function init(stream) {
   faceOverlay.id = src_webgazer.params.faceOverlayId;
   faceOverlay.style.display = src_webgazer.params.showFaceOverlay ? 'block' : 'none';
   faceOverlay.style.position = 'fixed';
+  /*** Added style by nekocodeX on Sep 27, 2020 ***/
+  faceOverlay.style.zIndex = 1001;
+
   faceOverlay.style.top = topDist;
   faceOverlay.style.left = leftDist;
 
@@ -88273,6 +88279,9 @@ async function init(stream) {
   faceFeedbackBox.id = src_webgazer.params.faceFeedbackBoxId;
   faceFeedbackBox.style.display = src_webgazer.params.showFaceFeedbackBox ? 'block' : 'none';
   faceFeedbackBox.style.position = 'fixed';
+  /*** Added style by nekocodeX on Sep 27, 2020 ***/
+  faceFeedbackBox.style.zIndex = 1001;
+  
   faceFeedbackBox.style.border = 'solid';
 
   // Gaze dot
@@ -88462,7 +88471,7 @@ src_webgazer.stopVideo = function() {
   return src_webgazer;
 }
 
-/** Add funcrion **/
+/*** Added function by nekocodeX on Sep 16, 2020 ***/
 src_webgazer.startVideo = function() {
     return new Promise(async (resolve, reject) => {
         let stream;

@@ -4,10 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="./main.css">
+    <title>StreetView-Gazer</title>
+    <link rel="stylesheet" href="./css/main.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
         integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"
+        integrity="sha512-AA1Bzp5Q0K1KanKKmvN/4d3IRKVlv9PYgwFPvm32nPO6QS8yH1HO7LbgB1pgiOxPtfeg5zEn2ba64MUcqJx6CA=="
         crossorigin="anonymous"></script>
     <script src="./js/webgazer.js"></script>
 </head>
@@ -24,7 +27,7 @@
             <p class="overlay-title">オーバレイ表示</p>
         </div>
         <div id="overlay-tr" class="overlay">
-            <p class="overlay-title">お気に入り</p>
+            <p class="overlay-title">URLをコピー</p>
         </div>
         <div id="overlay-l" class="overlay">
             <p class="overlay-title">左移動</p>
@@ -38,9 +41,23 @@
         <div id="overlay-bc" class="overlay">
             <p class="overlay-title">後退</p>
         </div>
+        <div id="street-view"></div>
+    </div>
+
+    <div class="calibration">
+        <div id="pt1" data-id="pt1" class="calibration-pt">10</div>
+        <div id="pt2" data-id="pt2" class="calibration-pt">10</div>
+        <div id="pt3" data-id="pt3" class="calibration-pt">10</div>
+        <div id="pt4" data-id="pt4" class="calibration-pt">10</div>
+        <div id="pt5" data-id="pt5" class="calibration-pt">10</div>
+        <div id="pt6" data-id="pt6" class="calibration-pt">10</div>
+        <div id="pt7" data-id="pt7" class="calibration-pt">10</div>
+        <div id="pt8" data-id="pt8" class="calibration-pt">10</div>
     </div>
 
     <script src="./js/controller.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDHsfdKcsV1xG6asD6zP4--Bb_0QxU5a-Y"></script>
+    <script src="./js/walker.js"></script>
 </body>
 
 </html>

@@ -21,6 +21,33 @@ webgazer.setGazeListener(function (getData, elapsedTime) {
 /*** 関数類 ***/
 // ページロード時処理
 function init() {
+    // 初期アラート表示
+    swal({
+        buttons: {
+            github: {
+                text: "GitHub Repo",
+                className: "swal-button--cancel",
+            },
+            calibration: "キャリブレーション開始",
+        },
+        title: "キャリブレーションが必要です",
+        text: "[キャリブレーション開始] を押してウィンドウ枠に沿って表示される各数字をマウスポインタを見ながら、それぞれ 0 になるまでクリックしてください\n\n【注意事項】\n- Webカメラへのアクセスを許可してください\n- PCの主要なブラウザのみ対応しています\n- キャリブレーションを終えても不十分だと考えられる場合は不十分な場所でマウスポインタを見ながらクリックすると精度向上を行うことができます",
+        icon: "warning",
+        closeOnClickOutside: false,
+        closeOnEsc: false,
+    }).then((select) => {
+        switch (select) {
+            case "github":
+                window.open("https://github.com/nekocodeX/StreetView-Gazer");
+                init();
+                break;
+
+            case "calibration":
+                $(".container").fadeOut(MSG_DISPLAY_TIME * 1000);
+                $(".calibration").fadeIn(MSG_DISPLAY_TIME * 1000);
+                break;
+        }
+    });
 }
 
 // 要素キーから変換
@@ -31,7 +58,7 @@ function toReadable(elemKey) {
         case "tc":
             return ("オーバレイ表示");
         case "tr":
-            return ("お気に入り");
+            return ("URLをコピー");
         case "l":
             return ("左移動");
         case "cc":
@@ -40,6 +67,42 @@ function toReadable(elemKey) {
             return ("右移動");
         case "bc":
             return ("後退");
+        case undefined:
+            return;
+        default:
+            return;
+    }
+}
+
+// 要素キーから処理実行
+function toAction(elemKey) {
+    switch (elemKey) {
+        case "tl":
+            // カメラ
+            return;
+        case "tc":
+            // オーバレイ表示
+            return;
+        case "tr":
+            // URLをコピー
+            copyNowMapURL(streetViewControl);
+            return;
+        case "l":
+            // 左移動
+            setHandle(streetViewControl, "l");
+            return;
+        case "cc":
+            // 前進
+            setGear(streetViewControl, "d");
+            return;
+        case "r":
+            // 右移動
+            setHandle(streetViewControl, "r");
+            return;
+        case "bc":
+            // 後退
+            setGear(streetViewControl, "r");
+            return;
         case undefined:
             return;
         default:
@@ -96,31 +159,31 @@ function startController() {
             if (DEBUG) console.log("[視線推定座標]" + data.x + ", " + data.y + "\n[ウィンドウサイズ]" + document.documentElement.clientWidth + ", " + document.documentElement.clientHeight);
             // x横 y縦
             // 視線座標判定
-            if ((0 <= data.x && data.x <= 320) &&
-                (0 <= data.y && data.y <= 240)) where = "tl";
+            if ((-50 <= data.x && data.x <= 320) &&
+                (-50 <= data.y && data.y <= 240)) where = "tl";
             else if ((320 < data.x && data.x <= document.documentElement.clientWidth - 320) &&
-                (0 <= data.y && data.y <= 240)) where = "tc";
-            else if ((document.documentElement.clientWidth - 320 < data.x && data.x <= document.documentElement.clientWidth) &&
-                (0 <= data.y && data.y <= 240)) where = "tr";
+                (-50 <= data.y && data.y <= 240)) where = "tc";
+            else if ((document.documentElement.clientWidth - 320 < data.x && data.x <= document.documentElement.clientWidth + 50) &&
+                (-50 <= data.y && data.y <= 240)) where = "tr";
 
-            else if ((0 <= data.x && data.x <= document.documentElement.clientWidth * 0.2) &&
-                (240 < data.y && data.y <= document.documentElement.clientHeight)) where = "l";
+            else if ((-50 <= data.x && data.x <= document.documentElement.clientWidth * 0.2) &&
+                (240 < data.y && data.y <= document.documentElement.clientHeight + 50)) where = "l";
 
             else if ((document.documentElement.clientWidth * 0.2 < data.x && data.x <= document.documentElement.clientWidth * 0.8) &&
                 (240 < data.y && data.y <= document.documentElement.clientHeight - 240)) where = "cc";
 
-            else if ((document.documentElement.clientWidth * 0.8 < data.x && data.x <= document.documentElement.clientWidth) &&
-                (240 < data.y && data.y <= document.documentElement.clientHeight)) where = "r";
+            else if ((document.documentElement.clientWidth * 0.8 < data.x && data.x <= document.documentElement.clientWidth + 50) &&
+                (240 < data.y && data.y <= document.documentElement.clientHeight + 50)) where = "r";
 
             else if ((document.documentElement.clientWidth * 0.2 < data.x && data.x <= document.documentElement.clientWidth * 0.8) &&
-                (document.documentElement.clientHeight - 240 < data.y && data.y <= document.documentElement.clientHeight)) where = "bc";
+                (document.documentElement.clientHeight - 240 < data.y && data.y <= document.documentElement.clientHeight + 50)) where = "bc";
             else where = undefined;
 
             // 配列に視線座標判定をトレース
             for (var i = CHECK_INTERVAL; i > 0; i--) historyData[i] = historyData[i - 1];
             historyData[0] = where;
 
-            console.log(historyData);
+            if (DEBUG) console.log(historyData);
 
             // 視線位置がオーバーレイ表示だった場合
             if (historyData[0] === "tc") showOverlay(FADE_TIME);
@@ -147,7 +210,10 @@ function startController() {
             if (match_cnt === CHECK_INTERVAL) act_flg = true;
 
             if (act_flg) {
-                if (typeof toReadable(historyData[0]) !== "undefined" && historyData[0] !== "tl" && historyData[0] !== "tc") console.log(toReadable(historyData[0]));
+                if (typeof toReadable(historyData[0]) !== "undefined" && historyData[0] !== "tl" && historyData[0] !== "tc") {
+                    if (DEBUG) console.log(toReadable(historyData[0]));
+                    toAction(historyData[0]);
+                }
                 historyData = Array(CHECK_INTERVAL);
             }
         }
@@ -168,8 +234,36 @@ $(function () {
     init();
 });
 
+/*** キャリブレーションガイド処理 ***/
+let calibratedId = Array(7), tempCnt = 0;
+$(".calibration-pt").on("click", function () {
+    if (1 <= $(this).text() && $(this).text() <= 10) {
+        $(this).text($(this).text() - 1);
+        if ($(this).text() == 0) calibratedId[$(this).data("id").replace("pt", "")] = 1;
+        tempCnt = 0;
+        calibratedId.forEach(temp => {
+            if (temp === 1) tempCnt++;
+        });
+        if (tempCnt === 8) {
+            // キャリブレーション完了
+            $(".calibration").fadeOut(MSG_DISPLAY_TIME * 1000);
+            swal({
+                title: "キャリブレーションが完了しました",
+                text: "それでは、StreetView-Gazer での旅をお楽しみください！\n疲れない、いつでも、どこでも快適な環境で良い旅を。",
+                icon: "success",
+                closeOnClickOutside: false,
+                closeOnEsc: false,
+            }).then(() => {
+                $(".container").fadeIn(MSG_DISPLAY_TIME * 1000, function () {
+                    startController();
+                });
+            });
+        }
+    }
+});
+
 /*** ウィンドウリサイズ時処理 ***/
-let isOperable = currentState = (document.documentElement.clientWidth >= 640 && document.documentElement.clientHeight >= 720) ? true : false;
+let isOperable = currentState = (document.documentElement.clientWidth >= 640 && document.documentElement.clientHeight >= 720) ? true : false, isWindowResizeMsg = false;
 $(window).resize(function () {
     if (webgazer.isReady()) {
         // 動作可能最低解像度: 640×720
@@ -181,10 +275,15 @@ $(window).resize(function () {
             // 動作不能
             cannotOperate();
         } else {
-            if (DEBUG) console.log("[ウィンドウリサイズ] 無視");
+            if (!isWindowResizeMsg) {
+                isWindowResizeMsg = true;
+                $("#overlay-msg").html("【情報】ウィンドウサイズの変更が検出されました<br>正しく動作しない場合はリロードしてキャリブレーションを再実行してください");
+                $("#overlay-float").fadeIn(FADE_TIME * 1000);
+                $("#overlay-float").delay(MSG_DISPLAY_TIME * 1000).fadeOut(FADE_TIME * 1000, function () {
+                    $("#overlay-msg").text("");
+                    isWindowResizeMsg = false;
+                });
+            }
         }
     }
 });
-
-/*** コントローラ開始 ***/
-startController();
