@@ -107,6 +107,7 @@ var streetViewControl = new google.maps.StreetViewPanorama(document.getElementBy
     addressControl: true,
     clickToGo: false,
     scrollwheel: false,
+    motionTracking: false,
     pov: {
         heading: 0,
         pitch: 10
