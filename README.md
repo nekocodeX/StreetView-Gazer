@@ -44,3 +44,7 @@
 -   URL パラメータで地図座標の指定が可能
 
     e.g.) `https://streetview-gazer.nekocodex.cf/?lat={緯度}&lng={経度}`
+
+## ©️ ライセンス
+
+GNU General Public License v3.0
